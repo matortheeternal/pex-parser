@@ -1,0 +1,148 @@
+const opcodes = [{
+    code: 0x00,
+    name: 'nop',
+    numArgs: 0
+}, {
+    code: 0x01,
+    name: 'iadd',
+    numArgs: 3
+}, {
+    code: 0x02,
+    name: 'fadd',
+    numArgs: 3
+}, {
+    code: 0x03,
+    name: 'isub',
+    numArgs: 3
+}, {
+    code: 0x04,
+    name: 'fsub',
+    numArgs: 3
+}, {
+    code: 0x05,
+    name: 'imul',
+    numArgs: 3
+}, {
+    code: 0x06,
+    name: 'fmul',
+    numArgs: 3
+}, {
+    code: 0x07,
+    name: 'idiv',
+    numArgs: 3
+}, {
+    code: 0x08,
+    name: 'fdiv',
+    numArgs: 3
+}, {
+    code: 0x09,
+    name: 'imod',
+    numArgs: 3
+}, {
+    code: 0x0A,
+    name: 'not',
+    numArgs: 2
+}, {
+    code: 0x0B,
+    name: 'ineg',
+    numArgs: 2
+}, {
+    code: 0x0C,
+    name: 'fneg',
+    numArgs: 2
+}, {
+    code: 0x0D,
+    name: 'assign',
+    numArgs: 2
+}, {
+    code: 0x0E,
+    name: 'cast',
+    numArgs: 2
+}, {
+    code: 0x0F,
+    name: 'cmp_eq',
+    numArgs: 3
+}, {
+    code: 0x10,
+    name: 'cmp_lt',
+    numArgs: 3
+}, {
+    code: 0x11,
+    name: 'cmp_le',
+    numArgs: 3
+}, {
+    code: 0x12,
+    name: 'cmp_gt',
+    numArgs: 3
+}, {
+    code: 0x13,
+    name: 'cmp_ge',
+    numArgs: 3
+}, {
+    code: 0x14,
+    name: 'jmp',
+    numArgs: 1
+}, {
+    code: 0x15,
+    name: 'jmpt',
+    numArgs: 2
+}, {
+    code: 0x16,
+    name: 'jmpf',
+    numArgs: 2
+}, {
+    code: 0x17,
+    name: 'callmethod',
+    numArgs: 3,
+    varArgs: true
+}, {
+    code: 0x18,
+    name: 'callparent',
+    numArgs: 2,
+    varArgs: true
+}, {
+    code: 0x19,
+    name: 'callstatic',
+    numArgs: 3,
+    varArgs: true
+}, {
+    code: 0x1A,
+    name: 'return',
+    numArgs: 1
+}, {
+    code: 0x1B,
+    name: 'strcat',
+    numArgs: 3
+}, {
+    code: 0x1C,
+    name: 'propget',
+    numArgs: 3
+}, {
+    code: 0x1D,
+    name: 'propset',
+    numArgs: 3
+}, {
+    code: 0x1E,
+    name: 'array_create',
+    numArgs: 2
+}, {
+    code: 0x1F,
+    name: 'array_length',
+    numArgs: 2
+}, {
+    code: 0x20,
+    name: 'array_getelement',
+    numArgs: 3
+}, {
+    code: 0x21,
+    name: 'array_setelement',
+    numArgs: 3
+}, {
+    code: 0x22,
+    name: 'array_findelement',
+    numArgs: 4
+}, {
+    code: 0x23,
+    name: 'array_rfindelement',
+    numArgs: 4
+}];
