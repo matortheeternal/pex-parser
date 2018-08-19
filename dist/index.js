@@ -1,22 +1,33 @@
-const fs = require('fs');
-const ffp = require('ffp');
-const legacy = require('legacy-encoding');
+let fs = require('fs'),
+    ffp = require('ffp'),
+    legacy = require('legacy-encoding');
+
+let pexDataKeys = ['header', 'stringTable', 'debugInfo', 'userFlags', 'objects'];
+
+let missingPexData = function(data) {
+    return pexDataKeys.findIndex(key => !data[key]) > -1;
+};
 
 class PexFile {
     constructor(filePath) {
-        if (!filePath)
-            throw new Error('File path is required.');
-        if (!fs.existsSync(filePath))
-            throw new Error(`File path "${filePath}" does not exist.`);
         this.filePath = filePath;
-        this.parse();
     }
 
-    parse() {
+    parse(cb) {
+        if (!this.filePath) throw new Error('File path is required.');
+        if (!fs.existsSync(this.filePath))
+            throw new Error(`File path "${this.filePath}" does not exist.`);
         let pexFileFormat = ffp.getDataFormat('PexFile');
-        ffp.parseFile(this.filePath, pexFileFormat, data => {
+        ffp.parseFile(this.filePath, pexFileFormat, (err, data) => {
             Object.assign(this, data);
+            cb && cb(err);
         });
+    }
+
+    write(cb) {
+        if (!this.filePath) throw new Error('File path is required.');
+        if (missingPexData(this)) throw new Error('PEX Data is incomplete.');
+        ffp.writeFile(this.filePath, pexFileFormat, this, cb);
     }
 }
 
@@ -28,19 +39,39 @@ ffp.addDataType('null', {
 });
 
 ffp.addDataType('uint16', {
-    read: stream => stream.read(2).readUInt16BE()
+    read: stream => stream.read(2).readUInt16BE(),
+    write: (stream, entity, data) => {
+        let buf = Buffer.alloc(2);
+        buf.writeUInt16BE(data);
+        stream.write(buf);
+    }
 });
 
 ffp.addDataType('uint32', {
-    read: stream => stream.read(4).readUInt32BE()
+    read: stream => stream.read(4).readUInt32BE(),
+    write: (stream, entity, data) => {
+        let buf = Buffer.alloc(4);
+        buf.writeUInt32BE(data);
+        stream.write(buf);
+    }
 });
 
 ffp.addDataType('int32', {
-    read: stream => stream.read(4).readInt32BE()
+    read: stream => stream.read(4).readInt32BE(),
+    write: (stream, entity, data) => {
+        let buf = Buffer.alloc(4);
+        buf.writeInt32BE(data);
+        stream.write(buf);
+    }
 });
 
 ffp.addDataType('float', {
-    read: stream => stream.read(4).readFloatBE()
+    read: stream => stream.read(4).readFloatBE(),
+    write: (stream, entity, data) => {
+        let buf = Buffer.alloc(4);
+        buf.writeFloatBE(data);
+        stream.write(buf);
+    }
 });
 
 ffp.addDataType('bstring', {
@@ -49,14 +80,31 @@ ffp.addDataType('bstring', {
         if (len === 0) return '';
         let buf = stream.read(len);
         return legacy.decode(buf, 'cp1252');
+    },
+    write: (stream, entity, data) => {
+        let buf = Buffer.alloc(2 + data.length);
+        buf.writeUInt16BE(data.length);
+        buf.write(data, 2, data.length, 'ascii');
+        stream.write(buf);
     }
 });
+
+const twoTo32 = Math.pow(2, 32);
 
 ffp.addDataType('time_t', {
     read: stream => {
         let buf = stream.read(8),
-            uint64 = buf.readUInt32BE() * 4294967296 + buf.readUInt32BE(4);
+            uint64 = buf.readUInt32BE() * twoTo32 + buf.readUInt32BE(4);
         return new Date(uint64 * 1000);
+    },
+    write: (stream, entity, data) => {
+        let buf = Buffer.alloc(8),
+            num = Math.trunc(data / 1000),
+            big = Math.trunc(num / twoTo32),
+            small = num % twoTo32;
+        buf.writeUInt32BE(big);
+        buf.writeUInt32BE(small, 4);
+        stream.write(buf);
     }
 });
 
@@ -223,17 +271,26 @@ let getAdditionalArgs = function(stream, args, VariableData) {
 ffp.addDataType('Instruction', {
     read: stream => {
         let uint8 = ffp.getDataType('uint8'),
-            instruction = { arguments: [], op: uint8.read(stream) },
-            opcodeInfo = opcodes[instruction.op];
+            op = uint8.read(stream),
+            opcodeInfo = opcodes[op];
         if (!opcodeInfo)
-            throw new Error(`Unknown opcode ${instruction.op}`);
-        let args = instruction.arguments,
+            throw new Error(`Unknown opcode ${op}`);
+        let args = [],
             VariableData = ffp.getDataFormat('VariableData'),
             numArgs = opcodeInfo.numArgs;
         for (let i = 0; i < numArgs; i++)
             args.push(ffp.parseSchema(stream, VariableData));
         if (opcodeInfo.varArgs) getAdditionalArgs(stream, args, VariableData);
-        return instruction;
+        return { op: op, arguments: args };
+    },
+    write: (stream, entity, data) => {
+        let buf = Buffer.alloc(1);
+        buf.writeUInt8(data.op);
+        stream.write(buf);
+        let VariableData = ffp.getDataFormat('VariableData');
+        data.arguments.forEach(arg => {
+            ffp.writeSchema(stream, VariableData, arg);
+        });
     }
 });
 

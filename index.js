@@ -1,22 +1,33 @@
-const fs = require('fs');
-const ffp = require('ffp');
-const legacy = require('legacy-encoding');
+let fs = require('fs'),
+    ffp = require('ffp'),
+    legacy = require('legacy-encoding');
+
+let pexDataKeys = ['header', 'stringTable', 'debugInfo', 'userFlags', 'objects'];
+
+let missingPexData = function(data) {
+    return pexDataKeys.findIndex(key => !data[key]) > -1;
+};
 
 class PexFile {
     constructor(filePath) {
-        if (!filePath)
-            throw new Error('File path is required.');
-        if (!fs.existsSync(filePath))
-            throw new Error(`File path "${filePath}" does not exist.`);
         this.filePath = filePath;
-        this.parse();
     }
 
-    parse() {
+    parse(cb) {
+        if (!this.filePath) throw new Error('File path is required.');
+        if (!fs.existsSync(this.filePath))
+            throw new Error(`File path "${this.filePath}" does not exist.`);
         let pexFileFormat = ffp.getDataFormat('PexFile');
-        ffp.parseFile(this.filePath, pexFileFormat, data => {
+        ffp.parseFile(this.filePath, pexFileFormat, (err, data) => {
             Object.assign(this, data);
+            cb && cb(err);
         });
+    }
+
+    write(cb) {
+        if (!this.filePath) throw new Error('File path is required.');
+        if (missingPexData(this)) throw new Error('PEX Data is incomplete.');
+        ffp.writeFile(this.filePath, pexFileFormat, this, cb);
     }
 }
 
