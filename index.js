@@ -27,6 +27,7 @@ class PexFile {
     write(cb) {
         if (!this.filePath) throw new Error('File path is required.');
         if (missingPexData(this)) throw new Error('PEX Data is incomplete.');
+        let pexFileFormat = ffp.getDataFormat('PexFile');
         ffp.writeFile(this.filePath, pexFileFormat, this, cb);
     }
 }

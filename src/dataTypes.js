@@ -81,6 +81,7 @@ let getAdditionalArgs = function(stream, args, VariableData) {
     let additionalArgs = ffp.parseSchema(stream, VariableData);
     if (additionalArgs.type !== VARTYPE_INTEGER)
         throw new Error(`Found additional args VariableData type ${additionalArgs.type}, expected type 3.`);
+    args.push(additionalArgs);
     for (let i = 0; i < additionalArgs.data; i++)
         args.push(ffp.parseSchema(stream, VariableData));
 };

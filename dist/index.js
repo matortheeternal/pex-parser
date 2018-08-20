@@ -27,6 +27,7 @@ class PexFile {
     write(cb) {
         if (!this.filePath) throw new Error('File path is required.');
         if (missingPexData(this)) throw new Error('PEX Data is incomplete.');
+        let pexFileFormat = ffp.getDataFormat('PexFile');
         ffp.writeFile(this.filePath, pexFileFormat, this, cb);
     }
 }
@@ -264,6 +265,7 @@ let getAdditionalArgs = function(stream, args, VariableData) {
     let additionalArgs = ffp.parseSchema(stream, VariableData);
     if (additionalArgs.type !== VARTYPE_INTEGER)
         throw new Error(`Found additional args VariableData type ${additionalArgs.type}, expected type 3.`);
+    args.push(additionalArgs);
     for (let i = 0; i < additionalArgs.data; i++)
         args.push(ffp.parseSchema(stream, VariableData));
 };
