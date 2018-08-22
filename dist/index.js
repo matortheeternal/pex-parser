@@ -36,7 +36,8 @@ PexFile.magic = 0xFA57C0DE;
 
 // DATA TYPES
 ffp.addDataType('null', {
-    read: () => null
+    read: () => null,
+    write: () => null
 });
 
 ffp.addDataType('uint16', {
@@ -106,6 +107,31 @@ ffp.addDataType('time_t', {
         buf.writeUInt32BE(big);
         buf.writeUInt32BE(small, 4);
         stream.write(buf);
+    }
+});
+
+let flagTest = function(store, entity) {
+    let flagsValue = store[entity.flag.key],
+        maskedValue = flagsValue & entity.flag.value;
+    return entity.flag.expect ?
+        maskedValue === entity.flag.expect : maskedValue !== 0;
+};
+
+ffp.addDataType('flagData', {
+    read: (stream, entity, store) => {
+        debugger;
+        if (!flagTest(store, entity)) return;
+        let entryType = ffp.getDataType(entity.entry.type);
+        if (!entryType)
+            throw new Error(`Data type ${entity.entry.type} not found.`);
+        return entryType.read(stream, entity.entry, store);
+    },
+    write: (stream, entity, data, context) => {
+        if (!flagTest(context, entity)) return;
+        let entryType = ffp.getDataType(entity.entry.type);
+        if (!entryType)
+            throw new Error(`Data type ${entity.entry.type} not found.`);
+        return entryType.write(stream, entity.entry, data, context);
     }
 });
 
@@ -474,15 +500,19 @@ ffp.addDataFormat('Property', [{
     type: 'uint8',
     storageKey: 'flags'
 }, {
-    type: 'uint16',
+    type: 'flagData',
+    flag: {key: 'flags', value: 4},
+    entry: {type: 'uint16'},
     storageKey: 'autoVarName'
 }, {
-    type: 'record',
-    format: 'Function',
+    type: 'flagData',
+    flag: {key: 'flags', value: 5, expect: 1},
+    entry: {type: 'record', format: 'Function'},
     storageKey: 'readHandler'
 }, {
-    type: 'record',
-    format: 'Function',
+    type: 'flagData',
+    flag: {key: 'flags', value: 6, expect: 2},
+    entry: {type: 'record', format: 'Function'},
     storageKey: 'writeHandler'
 }]);
 

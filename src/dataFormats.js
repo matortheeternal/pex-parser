@@ -175,15 +175,19 @@ ffp.addDataFormat('Property', [{
     type: 'uint8',
     storageKey: 'flags'
 }, {
-    type: 'uint16',
+    type: 'flagData',
+    flag: {key: 'flags', value: 4},
+    entry: {type: 'uint16'},
     storageKey: 'autoVarName'
 }, {
-    type: 'record',
-    format: 'Function',
+    type: 'flagData',
+    flag: {key: 'flags', value: 5, expect: 1},
+    entry: {type: 'record', format: 'Function'},
     storageKey: 'readHandler'
 }, {
-    type: 'record',
-    format: 'Function',
+    type: 'flagData',
+    flag: {key: 'flags', value: 6, expect: 2},
+    entry: {type: 'record', format: 'Function'},
     storageKey: 'writeHandler'
 }]);
 

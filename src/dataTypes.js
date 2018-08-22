@@ -1,5 +1,6 @@
 ffp.addDataType('null', {
-    read: () => null
+    read: () => null,
+    write: () => null
 });
 
 ffp.addDataType('uint16', {
@@ -69,6 +70,31 @@ ffp.addDataType('time_t', {
         buf.writeUInt32BE(big);
         buf.writeUInt32BE(small, 4);
         stream.write(buf);
+    }
+});
+
+let flagTest = function(store, entity) {
+    let flagsValue = store[entity.flag.key],
+        maskedValue = flagsValue & entity.flag.value;
+    return entity.flag.expect ?
+        maskedValue === entity.flag.expect : maskedValue !== 0;
+};
+
+ffp.addDataType('flagData', {
+    read: (stream, entity, store) => {
+        debugger;
+        if (!flagTest(store, entity)) return;
+        let entryType = ffp.getDataType(entity.entry.type);
+        if (!entryType)
+            throw new Error(`Data type ${entity.entry.type} not found.`);
+        return entryType.read(stream, entity.entry, store);
+    },
+    write: (stream, entity, data, context) => {
+        if (!flagTest(context, entity)) return;
+        let entryType = ffp.getDataType(entity.entry.type);
+        if (!entryType)
+            throw new Error(`Data type ${entity.entry.type} not found.`);
+        return entryType.write(stream, entity.entry, data, context);
     }
 });
 
