@@ -3,7 +3,7 @@ let path = require('path'),
     ffp = require('ffp'),
     {PexFile} = require('../dist/index');
 
-let scriptsPath = path.resolve(__dirname, './scripts'),
+let inputPath = path.resolve(__dirname, './input'),
     outputPath = path.resolve(__dirname, './output');
 
 ffp.setLogger({
@@ -13,7 +13,7 @@ ffp.setLogger({
 });
 
 let testFile = function(filename, done) {
-    let scriptPath = path.resolve(scriptsPath, filename),
+    let scriptPath = path.resolve(inputPath, filename),
         copyPath = path.resolve(outputPath, filename),
         script = new PexFile(scriptPath);
     script.parse(err => {
@@ -37,11 +37,18 @@ let testFile = function(filename, done) {
 
 describe('Pex File Writing', () => {
     describe('binary identical', () => {
-        let files = fs.readdirSync(scriptsPath, {});
-        files.forEach(file => {
-            it(`should be binary identical, ${file}`, done => {
-                testFile(file, done);
+        let files = fs.readdirSync(inputPath, {})
+            .filter(file => file.endsWith('.pex'));
+        if (!files.length) {
+            it(`should have files to test`, () => {
+                throw new Error('There are no scripts to compare.  Copy some .pex files to the test/input folder to test them.')
             });
-        })
+        } else {
+            files.forEach(file => {
+                it(`should be binary identical, ${file}`, done => {
+                    testFile(file, done);
+                });
+            });
+        }
     });
 });

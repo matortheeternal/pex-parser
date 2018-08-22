@@ -3,3 +3,5 @@ node_modules/
 *.zip
 coverage/
 test/_backup/
+test/output/*.pex
+test/input/*.pex
