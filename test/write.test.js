@@ -1,6 +1,6 @@
 let path = require('path'),
     fs = require('fs'),
-    ffp = require('ffp'),
+    ffp = require('file-format-parser'),
     {PexFile} = require('../dist/index');
 
 let inputPath = path.resolve(__dirname, './input'),

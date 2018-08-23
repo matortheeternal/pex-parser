@@ -1,63 +1,70 @@
 let hexStr = num => `0x${num.toString(16)}`;
 
-ffp.addDataFormat('PexFile', {
-    header: [{
-        type: 'uint32',
-        storageKey: 'magic',
-        callback: value => {
-            if (value !== PexFile.magic)
-                throw new Error(`Expected magic ${hexStr(PexFile.magic)}, found ${hexStr(value)}`);
-        }
-    }, {
-        type: 'uint8',
-        storageKey: 'majorVersion'
-    }, {
-        type: 'uint8',
-        storageKey: 'minorVersion'
-    }, {
-        type: 'uint16',
-        storageKey: 'gameId'
-    }, {
-        type: 'time_t',
-        storageKey: 'compilationTime'
-    }, {
-        type: 'bstring',
-        storageKey: 'sourceFileName'
-    }, {
-        type: 'bstring',
-        storageKey: 'username'
-    }, {
-        type: 'bstring',
-        storageKey: 'machinename'
-    }],
-    stringTable: {
-        type: 'array',
-        count: {type: 'uint16'},
-        entry: {type: 'bstring'}
-    },
-    debugInfo: [{
-        type: 'uint8',
-        storageKey: 'hasDebugInfo'
-    }, {
-        type: 'time_t',
-        storageKey: 'modificationTime'
-    }, {
-        type: 'array',
-        count: {type: 'uint16'},
-        entry: {type: 'record', format: 'DebugFunction'},
-        storageKey: 'functions'
-    }],
-    userFlags: {
-        type: 'array',
-        count: {type: 'uint16'},
-        entry: {type: 'record', format: 'UserFlag'}
-    },
-    objects: {
-        type: 'array',
-        count: {type: 'uint16'},
-        entry: {type: 'record', format: 'Object'}
-    }
-});
+ffp.addDataFormat('PexFile', [{
+    type: 'record',
+    format: 'PexHeader',
+    storageKey: 'header'
+}, {
+    type: 'array',
+    count: {type: 'uint16'},
+    entry: {type: 'bstring'},
+    storageKey: 'stringTable'
+}, {
+    type: 'record',
+    format: 'PexDebugInfo',
+    storageKey: 'debugInfo'
+}, {
+    type: 'array',
+    count: {type: 'uint16'},
+    entry: {type: 'record', format: 'UserFlag'},
+    storageKey: 'userFlags'
+}, {
+    type: 'array',
+    count: {type: 'uint16'},
+    entry: {type: 'record', format: 'Object'},
+    storageKey: 'objects'
+}]);
+
+ffp.addDataFormat('PexHeader', [{
+    type: 'uint32',
+    storageKey: 'magic',
+    errorMessage: 'PEX Magic does not match',
+    expectedValue: 0xFA57C0DE
+}, {
+    type: 'uint8',
+    storageKey: 'majorVersion'
+}, {
+    type: 'uint8',
+    storageKey: 'minorVersion'
+}, {
+    type: 'uint16',
+    storageKey: 'gameId'
+}, {
+    type: 'time_t',
+    storageKey: 'compilationTime'
+}, {
+    type: 'bstring',
+    storageKey: 'sourceFileName'
+}, {
+    type: 'bstring',
+    storageKey: 'username'
+}, {
+    type: 'bstring',
+    storageKey: 'machinename'
+}]);
+
+ffp.addDataFormat('PexDebugInfo', [{
+    type: 'uint8',
+    storageKey: 'hasDebugInfo'
+}, {
+    type: 'time_t',
+    storageKey: 'modificationTime'
+}, {
+    type: 'array',
+    count: {type: 'uint16'},
+    entry: {type: 'record', format: 'DebugFunction'},
+    storageKey: 'functions'
+}]);
 
 ffp.addDataFormat('DebugFunction', [{
     type: 'uint16',
