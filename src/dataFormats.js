@@ -1,4 +1,4 @@
-let hexStr = num => `0x${num.toString(16)}`;
+let ffp = require('file-format-parser');
 
 ffp.addDataFormat('PexFile', [{
     type: 'record',

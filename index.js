@@ -1,6 +1,8 @@
 let fs = require('fs'),
-    ffp = require('file-format-parser'),
-    legacy = require('legacy-encoding');
+    ffp = require('file-format-parser');
+
+require('./src/dataTypes');
+require('./src/dataFormats');
 
 let pexDataKeys = ['header', 'stringTable', 'debugInfo', 'userFlags', 'objects'];
 
@@ -13,28 +15,20 @@ class PexFile {
         this.filePath = filePath;
     }
 
-    parse(cb) {
+    parse() {
         if (!this.filePath) throw new Error('File path is required.');
         if (!fs.existsSync(this.filePath))
             throw new Error(`File path "${this.filePath}" does not exist.`);
-        ffp.parseFile(this.filePath, 'PexFile', (err, data) => {
-            Object.assign(this, data);
-            cb && cb(err);
-        });
+        let data = ffp.parseFile(this.filePath, 'PexFile');
+        Object.assign(this, data);
     }
 
-    write(cb) {
+    write() {
         if (!this.filePath) throw new Error('File path is required.');
         if (missingPexData(this)) throw new Error('PEX Data is incomplete.');
-        ffp.writeFile(this.filePath, 'PexFile', this, cb);
+        ffp.writeFile(this.filePath, 'PexFile', this);
     }
 }
-
-// DATA TYPES
-//= require src/dataTypes.js
-
-// DATA FORMATS
-//= require src/dataFormats.js
 
 // EXPORTS
 module.exports = { PexFile };

@@ -1,4 +1,4 @@
-const opcodes = [{
+module.exports = [{
     code: 0x00,
     name: 'nop',
     numArgs: 0

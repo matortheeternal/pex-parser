@@ -21,14 +21,11 @@
     "test": "jest --bail"
   },
   "dependencies": {
-    "file-format-parser": "^1.0.0",
+    "file-format-parser": "^2.0.0",
     "legacy-encoding": "^3.0.0"
   },
   "devDependencies": {
     "codecov": "^3.0.2",
-    "gulp": "^3.9.1",
-    "gulp-clean": "^0.4.0",
-    "gulp-include": "^2.3.1",
     "jest": "^23.5.0"
   }
 }

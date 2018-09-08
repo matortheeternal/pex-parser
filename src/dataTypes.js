@@ -1,3 +1,6 @@
+let ffp = require('file-format-parser'),
+    legacy = require('legacy-encoding');
+
 ffp.addDataType('null', {
     read: () => null,
     write: () => null
@@ -98,8 +101,7 @@ ffp.addDataType('flagData', {
     }
 });
 
-// OPCODES
-//= require opcodes.js
+const opcodes = require('./opcodes.js');
 
 const VARTYPE_INTEGER = 3;
 
