@@ -17,14 +17,10 @@ npm i matortheeternal/pex-parser --save
 ```javascript
 let {PexFile} = require('pex-parser');
 let script = new PexFile('./path/to/script.pex');
-script.parse(err => {
-    // optional callback which is called when the script has been parsed
-    // you can read things and make changes here
-    script.write(err => {
-        // optional callback which is called when 
-        // changes have been written to disk
-    });
-});
+script.parse();
+// you can read things and make changes here
+script.filePath = './path/to/copy.pex';
+script.write();
 ```
 
 ## properties
