@@ -1,7 +1,7 @@
 {
   "name": "pex-parser",
-  "description": "Tool for parsing and editing compiled Papyrus script files for Skyrim/Fallout 4.",
-  "version": "1.0.0",
+  "description": "Tool for parsing and editing compiled Papyrus script files for Skyrim and Skyrim SE.  Fallout 4 support is planned.",
+  "version": "1.1.0",
   "author": "Mator",
   "homepage": "https://github.com/matortheeternal/pex-parser#readme",
   "license": "MIT",
@@ -21,7 +21,7 @@
     "test": "jest --bail"
   },
   "dependencies": {
-    "file-format-parser": "^2.0.0",
+    "file-format-parser": "github:matortheeternal/ffp",
     "legacy-encoding": "^3.0.0"
   },
   "devDependencies": {

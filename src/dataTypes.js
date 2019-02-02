@@ -85,7 +85,6 @@ let flagTest = function(store, entity) {
 
 ffp.addDataType('flagData', {
     read: (stream, entity, store) => {
-        debugger;
         if (!flagTest(store, entity)) return;
         let entryType = ffp.getDataType(entity.entry.type);
         if (!entryType)
