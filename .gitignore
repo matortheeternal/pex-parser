@@ -3,3 +3,5 @@ node_modules/
 *.zip
 coverage/
 *.pex
+test/output/*.pex.json
+survey_output.txt
