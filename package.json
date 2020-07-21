@@ -25,7 +25,7 @@
     "legacy-encoding": "^3.0.0"
   },
   "devDependencies": {
-    "codecov": "^3.0.2",
+    "codecov": "^3.7.1",
     "jest": "^23.5.0"
   }
 }
