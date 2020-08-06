@@ -17,11 +17,10 @@
     "collectCoverage": true
   },
   "scripts": {
-    "build": "gulp build",
-    "test": "jest --bail"
+    "test": "jest"
   },
   "dependencies": {
-    "file-format-parser": "github:matortheeternal/ffp",
+    "file-format-parser": "^2.1.0",
     "legacy-encoding": "^3.0.0"
   },
   "devDependencies": {

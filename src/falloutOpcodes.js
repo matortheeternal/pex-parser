@@ -1,0 +1,45 @@
+module.exports = require('./skyrimOpcodes').concat([{
+    code: 0x24,
+    name: 'is',
+    numArgs: 3
+}, {
+    code: 0x25,
+    name: 'struct_create',
+    numArgs: 1
+}, {
+    code: 0x26,
+    name: 'struct_get',
+    numArgs: 3
+}, {
+    code: 0x27,
+    name: 'struct_set',
+    numArgs: 3
+}, {
+    code: 0x28,
+    name: 'array_findstruct',
+    numArgs: 5
+}, {
+    code: 0x29,
+    name: 'array_rfindstruct',
+    numArgs: 5
+}, {
+    code: 0x2A,
+    name: 'array_add',
+    numArgs: 3
+}, {
+    code: 0x2B,
+    name: 'array_insert',
+    numArgs: 3
+}, {
+    code: 0x2C,
+    name: 'array_removelast',
+    numArgs: 1
+}, {
+    code: 0x2D,
+    name: 'array_remove',
+    numArgs: 3
+}, {
+    code: 0x2E,
+    name: 'array_clear',
+    numArgs: 1
+}]);

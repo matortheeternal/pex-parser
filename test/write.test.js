@@ -1,49 +1,54 @@
 let path = require('path'),
     fs = require('fs'),
     ffp = require('file-format-parser'),
-    {PexFile} = require('../index');
+    {PexFile, setGame} = require('../index');
 
-let inputPath = path.resolve(__dirname, './input'),
-    outputPath = path.resolve(__dirname, './output');
+const noScriptsErrorMessage = 'There are no scripts to compare.  ' +
+    'Copy some .pex files to the test/input folder to test them.';
 
-ffp.setLogger({
-    log: () => {},
-    warn: () => {},
-    error: console.error
-});
+['TES5', 'FO4'].forEach(appName => {
+    describe(`Pex Files (${appName})`, () => {
+        let inputPath = path.resolve(__dirname, `./${appName}/input`);
+            outputPath = path.resolve(__dirname, `./${appName}/output`);
 
-let testFile = function(filename) {
-    let scriptPath = path.resolve(inputPath, filename),
-        copyPath = path.resolve(outputPath, filename),
-        script = new PexFile(scriptPath);
-    script.parse();
-    script.filePath = copyPath;
-    script.write();
-    let input = fs.readFileSync(scriptPath),
-        output = fs.readFileSync(copyPath);
-    expect(input).toBeDefined();
-    expect(output).toBeDefined();
-    expect(Buffer.isBuffer(input)).toBe(true);
-    expect(Buffer.isBuffer(output)).toBe(true);
-    expect(input.length).toBe(output.length);
-    expect(input).toEqual(output);
-    console.log(`Verified ${filename}`);
-};
+        let testFile = function(filename) {
+            let scriptPath = path.resolve(inputPath, filename),
+                copyPath = path.resolve(outputPath, filename),
+                script = new PexFile(scriptPath);
+            script.parse();
+            script.filePath = copyPath;
+            script.write();
+            let input = fs.readFileSync(scriptPath),
+                output = fs.readFileSync(copyPath);
+            expect(input).toBeDefined();
+            expect(output).toBeDefined();
+            expect(Buffer.isBuffer(input)).toBe(true);
+            expect(Buffer.isBuffer(output)).toBe(true);
+            expect(input.length).toBe(output.length);
+            expect(input).toEqual(output);
+        };
 
-describe('Pex File Writing', () => {
-    describe('binary identical', () => {
+        beforeAll(() => {
+            ffp.setLogger({
+                log: () => {},
+                warn: () => {},
+                error: console.error
+            });
+            setGame(appName);
+        });
+
         let files = fs.readdirSync(inputPath, {})
             .filter(file => file.endsWith('.pex'));
-        if (!files.length) {
-            it(`should have files to test`, () => {
-                throw new Error('There are no scripts to compare.  Copy some .pex files to the test/input folder to test them.')
+
+        it('should have files to test', () => {
+            if (!files.length)
+                throw new Error(noScriptsErrorMessage)
+        });
+
+        files.forEach(file => {
+            describe(file, () => {
+                it('should be binary identical', () => testFile(file));
             });
-        } else {
-            files.forEach(file => {
-                it(`should be binary identical, ${file}`, () => {
-                    testFile(file);
-                });
-            });
-        }
+        });
     });
 });
